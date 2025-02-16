@@ -8,9 +8,9 @@ namespace GenderNeutralizer.Api.Services
     public class CandidateService : ICandidateService
     {
         private readonly AppDbContext _db;
-        private readonly ILogger _logger;
+        private readonly ILogger<CandidateService> _logger;
 
-        public CandidateService(AppDbContext db, ILogger logger)
+        public CandidateService(AppDbContext db, ILogger<CandidateService> logger)
         {
             _db = db;
             _logger = logger;
