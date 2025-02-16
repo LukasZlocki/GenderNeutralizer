@@ -1,6 +1,7 @@
 ﻿using GenderNeutralizer.Api.Context;
 using GenderNeutralizer.Api.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Net.WebSockets;
 
 namespace GenderNeutralizer.Api.Services
 {
@@ -37,9 +38,10 @@ namespace GenderNeutralizer.Api.Services
             return candidates;
         }
 
-        public Task<Candidate> GetCandidateById(Guid id)
+        public async Task<Candidate> GetCandidateById(Guid id)
         {
-            throw new NotImplementedException();
+            var candidate = await _db.Candidates.FindAsync(id);
+            return candidate;
         }
     }
 }
