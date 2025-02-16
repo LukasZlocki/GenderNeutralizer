@@ -1,5 +1,6 @@
 ﻿using GenderNeutralizer.Api.Context;
 using GenderNeutralizer.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GenderNeutralizer.Api.Services
 {
@@ -30,9 +31,10 @@ namespace GenderNeutralizer.Api.Services
             }
         }
 
-        public Task<List<Candidate>> GetAllCandidates()
+        public async Task<List<Candidate>> GetAllCandidates()
         {
-            throw new NotImplementedException();
+            var candidates = await _db.Candidates.ToListAsync();
+            return candidates;
         }
 
         public Task<Candidate> GetCandidateById(Guid id)
