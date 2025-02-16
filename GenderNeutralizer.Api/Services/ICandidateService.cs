@@ -6,5 +6,6 @@ namespace GenderNeutralizer.Api.Services
     {
         public Task AddCandidate(Candidate candidate);
         public Task<Candidate> GetCandidateById(Guid id);
+        public Task<List<Candidate>> GetAllCandidates();
     }
 }
