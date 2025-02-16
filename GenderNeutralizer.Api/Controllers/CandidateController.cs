@@ -1,4 +1,5 @@
-﻿using GenderNeutralizer.Api.Services;
+﻿using GenderNeutralizer.Api.Models;
+using GenderNeutralizer.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GenderNeutralizer.Api.Controllers
@@ -19,6 +20,30 @@ namespace GenderNeutralizer.Api.Controllers
             var candidates = _dbCandidate.GetAllCandidates();
             return Ok(candidates);
         }
+
+        // GET
+        [HttpGet("api/candidate/{id}")]
+        public IActionResult GetCandidate(Guid id)
+        {
+            var candidate = _dbCandidate.GetCandidateById(id);
+            return Ok(candidate);
+        }
+
+        // CREATE
+        [HttpPost("api/candidateCreate")]
+        public IActionResult CreateCandidate([FromBody] Candidate candidate)
+        {
+            try
+            {
+                var result = _dbCandidate.AddCandidate(candidate);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
 
     }
 }
