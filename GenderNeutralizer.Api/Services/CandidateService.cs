@@ -22,7 +22,7 @@ namespace GenderNeutralizer.Api.Services
             try
             {
                 _db.Candidates.Add(candidate);
-                await _db.SaveChangesAsync();
+                _db.SaveChangesAsync();
                 _logger.LogInformation("Candadate created with ID {CandidateId}", candidate.CandidateId);
             }
             catch (Exception ex)
