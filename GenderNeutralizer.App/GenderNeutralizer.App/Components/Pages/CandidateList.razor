@@ -1,0 +1,66 @@
+﻿@page "/candidatelist"
+@using GenderNeutralizer.App.Models
+
+<h3>CandidateList</h3>
+
+
+@if (files != null && files.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>File Size (KB)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var file in files)
+            {
+                <tr>
+                    <td>@file.FileName</td>
+                    <td>@(file.FileSize / 1024) KB</td>
+                    <td>
+                        <!-- Add any actions you want, like download or delete -->
+                        <button class="btn btn-primary btn-sm">Download</button>
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No files found in the folder.</p>
+}
+
+@code { 
+    private List<FileInfo> files;
+
+    protected override void OnInitialized()
+    {
+        string directoryPath = @"C:\VirtualServer\GenderNeutralizer"; // Replace with your folder path
+        if (Directory.Exists(directoryPath))
+        {
+            var directoryInfo = new DirectoryInfo(directoryPath);
+            files = directoryInfo.GetFiles()
+                                 .Select(f => new FileInfo
+                                     {
+                                         FileName = f.Name,
+                                         FileSize = f.Length
+                                     })
+                                 .ToList();
+        }
+        else
+        {
+            files = new List<FileInfo>();
+        }
+    }
+
+    public class FileInfo
+    {
+        public string FileName { get; set; }
+        public long FileSize { get; set; }
+    }
+}
