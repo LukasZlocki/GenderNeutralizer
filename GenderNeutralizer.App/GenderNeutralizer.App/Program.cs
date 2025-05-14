@@ -1,5 +1,6 @@
 using GenderNeutralizer.App.Client.Pages;
 using GenderNeutralizer.App.Components;
+using GenderNeutralizer.App.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,8 @@ builder.Services.AddRazorComponents()
 
 // Register Http service
 builder.Services.AddHttpClient();
+
+builder.Services.AddTransient<ILocalDriveService, LocalDriveService>();
 
 var app = builder.Build();
 
