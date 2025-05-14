@@ -1,24 +1,28 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using GenderNeutralizer.App.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GenderNeutralizer.App.Services
 {
     public class LocalDriveService : ILocalDriveService
     {
-        public async Task<bool> UploadCV(IFormFile file)
+        public async Task<bool> UploadCV(FileCV file)
         {
-            if (file == null || file.Length == 0)
+            if (file == null || file.Content.Length == 0)
                 return false;
 
-            var targetDirectory = @"C:\VirtualServer\GenderNeutralizer";
+            var directoryPath = @"C:\VirtualServer\GenderNeutralizer";
 
-            if (!Directory.Exists(targetDirectory))
-                Directory.CreateDirectory(targetDirectory);
+            // Ensure the directory exists
+            if (!Directory.Exists(directoryPath))
+            {
+                Directory.CreateDirectory(directoryPath);
+            }
 
-            var filePath = Path.Combine(targetDirectory, file.FileName);
+            // Combine directory path and file name
+            string fullPath = Path.Combine(directoryPath, file.FileName);
 
-            using var stream = new FileStream(filePath, FileMode.Create);
-            await file.CopyToAsync(stream);
-
+            // Write the file to disk
+            File.WriteAllBytes(fullPath, file.Content);
             return true;
         }
     }

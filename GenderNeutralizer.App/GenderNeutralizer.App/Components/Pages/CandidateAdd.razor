@@ -1,7 +1,12 @@
 ﻿@page "/addcandidate"
-@attribute [StreamRendering]
+@using GenderNeutralizer.App.Models
+@using GenderNeutralizer.App.Services
+
+@rendermode InteractiveServer
 
 @inject HttpClient Http
+
+@inject ILocalDriveService _driveService
 
 <PageTitle>Add Candidate</PageTitle>
 
@@ -10,34 +15,48 @@
 <p>Add your CV here.</p>
 
 
-<InputFile OnChange="HandleSelected" />
-@if (status != null)
+<InputFile OnChange="OnInputFileChange" />
+@if (uploadedFile != null)
 {
-    <p>@status</p>
+    <p>Selected File: @uploadedFile.FileName</p>
+    <button class="btn btn-success rounded-pill px-4 shadow" @onclick="UploadToDisc">Upload to Server</button>
 }
 
 
 @code {
-    private string? status;
+    private FileCV? uploadedFile;
 
-    private async Task HandleSelected(InputFileChangeEventArgs e)
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var file = e.File;
-        var content = new MultipartFormDataContent();
-        var fileContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10_000_000)); // 10MB max
 
-        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
-        content.Add(content: fileContent, name: "\"file\"", fileName: file.Name);
+        using var stream = file.OpenReadStream(maxAllowedSize: 10_000_000);
+        using var memoryStream = new MemoryStream();
+        await stream.CopyToAsync(memoryStream);
 
-        var response = await Http.PostAsync("upload", content);
+        uploadedFile = new FileCV
+            {
+                FileName = file.Name,
+                ContentType = file.ContentType,
+                Content = memoryStream.ToArray()
+            };
+    }
 
-        if (response.IsSuccessStatusCode)
+    private async Task UploadToDisc()
+    {
+        if (uploadedFile == null) return;
+
+        //var response = await Http.PostAsync("uploadcv", content); // make sure the endpoint matches your API route
+        var response = await _driveService.UploadCV(uploadedFile);
+
+        if (response)
         {
-            status = "Upload successful!";
+            Console.WriteLine("File uploaded to disk.");
         }
         else
         {
-            status = "Upload failed.";
+            Console.WriteLine("Upload failed.");
         }
     }
+
 }
