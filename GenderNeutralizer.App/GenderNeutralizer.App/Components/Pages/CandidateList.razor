@@ -1,5 +1,10 @@
 ﻿@page "/candidatelist"
 @using GenderNeutralizer.App.Models
+@using GenderNeutralizer.App.Services
+
+@inject ITextExtractionService _textExtractionService
+
+@rendermode InteractiveServer
 
 <h3>CandidateList</h3>
 
@@ -22,8 +27,7 @@
                     <td>@(file.FileSize / 1024) KB</td>
                     <td>
                         <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-primary btn-sm">Download</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
+                        <button class="btn btn-danger btn-sm" @onclick="TextExtraction">Neutralize</button>
                     </td>
                 </tr>
             }
@@ -35,7 +39,7 @@ else
     <p>No files found in the folder.</p>
 }
 
-@code { 
+@code {
     private List<FileInfo> files;
 
     protected override void OnInitialized()
@@ -60,7 +64,14 @@ else
 
     public class FileInfo
     {
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
         public long FileSize { get; set; }
+    }
+
+    public void TextExtraction()
+    {
+        // [LZ] Empty file !!!!
+        FileCV file = new FileCV();
+        var txt = _textExtractionService.ExtractTextFromFile(file);
     }
 }

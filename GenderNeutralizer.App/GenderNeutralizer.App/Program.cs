@@ -13,6 +13,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddHttpClient();
 
 builder.Services.AddTransient<ILocalDriveService, LocalDriveService>();
+builder.Services.AddTransient<ITextExtractionService, TextExtractionService>();    
 
 var app = builder.Build();
 
