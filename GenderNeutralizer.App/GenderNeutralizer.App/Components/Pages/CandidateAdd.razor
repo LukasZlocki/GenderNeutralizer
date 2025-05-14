@@ -1,0 +1,43 @@
+﻿@page "/addcandidate"
+@attribute [StreamRendering]
+
+@inject HttpClient Http
+
+<PageTitle>Add Candidate</PageTitle>
+
+<h1>Add Candidate</h1>
+
+<p>Add your CV here.</p>
+
+
+<InputFile OnChange="HandleSelected" />
+@if (status != null)
+{
+    <p>@status</p>
+}
+
+
+@code {
+    private string? status;
+
+    private async Task HandleSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var content = new MultipartFormDataContent();
+        var fileContent = new StreamContent(file.OpenReadStream(maxAllowedSize: 10_000_000)); // 10MB max
+
+        fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+        content.Add(content: fileContent, name: "\"file\"", fileName: file.Name);
+
+        var response = await Http.PostAsync("upload", content);
+
+        if (response.IsSuccessStatusCode)
+        {
+            status = "Upload successful!";
+        }
+        else
+        {
+            status = "Upload failed.";
+        }
+    }
+}
