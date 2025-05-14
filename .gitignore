@@ -1,4 +1,10 @@
 GenderNeutralizer.Api/bin
 GenderNeutralizer.Api/obj
 
+GenderNeutralizer.App/GenderNeutralizer.App/obj
+GenderNeutralizer.App/GenderNeutralizer.App/bin
+
+GenderNeutralizer.App/GenderNeutralizer.App.Client/obj
+GenderNeutralizer.App/GenderNeutralizer.App.Client/bin
+
 .vs
