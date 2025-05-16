@@ -1,12 +1,5 @@
 ﻿using GenderNeutralizer.App.Models;
-using PdfiumViewer;
-using System;
-using System.Drawing;
-using System.Text;
-using Tesseract;
-using System.Drawing.Imaging;
-
-
+using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace GenderNeutralizer.App.Services
 {
@@ -22,46 +15,70 @@ namespace GenderNeutralizer.App.Services
 
         private string txtExtraction()
         {
-            string pdfPath = @"C:\VirtualServer\GenderNeutralizer\textToExtract.pdf";
-            string tessDataPath = @"./tessdata"; // Should contain 'eng.traineddata', etc.
-            StringBuilder extractedText = new StringBuilder();
+            string pdfPath = @"C:\VirtualServer\GenderNeutralizer\CV_LukaszZ_ENG_07042024.pdf";
+            string outputFolder = @"C:\VirtualServer\GenderNeutralizer\output";
+            string extractedText = string.Empty;
+            string neutralizedText = string.Empty;
 
-            var test = PdfDocument.Load(pdfPath);
+            // convert pdf to jpg
+            //string jpgPath = ConvertPdfToJpg(pdfPath, outputFolder);
+            extractedText = ExtractTextFromPdf(pdfPath, outputFolder);
 
+            // saving extracted text to file
+            string fullOutputPath1 = Path.Combine(outputFolder, "extractedText.txt");
+            bool isSucces = SaveText(extractedText, fullOutputPath1);
 
-            using (var pdfDoc = PdfDocument.Load(pdfPath))
-            using (var ocrEngine = new TesseractEngine(tessDataPath, "eng", Tesseract.EngineMode.Default))
-            {
-                for (int i = 0; i < pdfDoc.PageCount; i++)
-                {
-                    using (var image = pdfDoc.Render(i, 300, 300, true))
-                    using (var pix = PixConverter.ToPix((Bitmap)image))
-                    using (var page = ocrEngine.Process(pix))
-                    {
-                        extractedText.AppendLine(page.GetText());
-                    }
-                }
-            }
+            // adding newvline sign when . at the end of the sentence
+            string formatText = addNewlines(extractedText);
+            string fullOutputPath2 = Path.Combine(outputFolder, "extractedText_newlines.txt");
+            isSucces = SaveText(formatText, fullOutputPath2);
 
-            string ocrResult = extractedText.ToString();
-            Console.WriteLine("Extracted Text:\n" + ocrResult);
-
-            return ocrResult;
+            return neutralizedText;
         }
 
 
-        public static class PixConverter
+        private string ExtractTextFromPdf(string pdfPath, string outputFolder)
         {
-            public static Pix ToPix(Bitmap bitmap)
+            using var document = PdfDocument.Open(pdfPath);
+            var allText = new System.Text.StringBuilder();
+
+            foreach (var page in document.GetPages())
             {
-                using (var stream = new MemoryStream())
-                {
-                    bitmap.Save(stream, System.Drawing.Imaging.ImageFormat.Png);
-                    stream.Position = 0;
-                    return Pix.LoadFromMemory(stream.ToArray());
-                }
+                allText.AppendLine(page.Text);
+            }
+
+            return allText.ToString();
+        }
+
+        private bool SaveText(string txt, string outputPath)
+        {
+            try
+            {
+                File.WriteAllText(outputPath, txt);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (e.g., log the error)
+                return false;
             }
         }
+
+        // Add new line to text when .
+        private string addNewlines(string text)
+        {
+            // Replace every ". " (period followed by space) with ".\n" (period + newline)
+            // This splits sentences into new lines
+            string result = text.Replace(". ", "." + Environment.NewLine);
+
+            // Optional: Also handle if period is at the very end with no space after
+            // (so no extra newline added, or if you want, add it too)
+            if (result.EndsWith("."))
+                result += Environment.NewLine;
+
+            return result;
+        }
+
 
     }
 }
