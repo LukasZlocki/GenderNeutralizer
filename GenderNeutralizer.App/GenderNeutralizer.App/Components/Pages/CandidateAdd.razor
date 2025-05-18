@@ -7,6 +7,8 @@
 @inject HttpClient Http
 
 @inject ILocalDriveService _driveService
+@inject ICandidateService _candidateService
+@inject NavigationManager Navigation
 
 <PageTitle>Add Candidate</PageTitle>
 
@@ -34,11 +36,20 @@
     <button class="btn btn-success rounded-pill px-4 shadow" @onclick="CreateCandidate">Stwórz profil</button>
 }
 
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
 
 @code {
     private FileCV? uploadedFile;
     private Candidate candidate = new();
 
+    // error message purpose
+    private string? errorMessage;
+
+    // Upload file to FileCv object
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -55,16 +66,17 @@
             };
     }
 
-    private async Task<string> UploadToDisc()
+    // Upload file to local disc
+    private string UploadToDisc()
     {
-        string linkToUploadedFile;
+        string linkToUploadedFile = "";
 
         if (uploadedFile == null) return linkToUploadedFile;
 
         //var response = await Http.PostAsync("uploadcv", content); // make sure the endpoint matches your API route
-        linkToUploadedFile = await _driveService.UploadCV(uploadedFile);
+        linkToUploadedFile = _driveService.UploadCV(uploadedFile);
 
-        if (linkToUploadedFile)
+        if (!string.IsNullOrWhiteSpace(linkToUploadedFile))
         {
             Console.WriteLine("File uploaded to disk.");
             return linkToUploadedFile;
@@ -72,19 +84,31 @@
         else
         {
             Console.WriteLine("Upload failed.");
-            return linkToUploadedFile = "";
+            return linkToUploadedFile;
         }
     }
 
+    // Create candidate main method
     private async Task CreateCandidate()
     {
-        // ToDo: nagrac plik na dysk i pozyskac sciezke dostepu do pliku
+        // upload file to disk and 
+        string pathToFile = UploadToDisc();
 
-        // ToDo: dodac sciezke dostepu do modelu kandydata
+        //get the path of uploaded file
+        candidate.CvFilePath = pathToFile;
+
         // ToDo: stworzyc kandydata - parametr object candidate
-        // jesli success przekierowac na glown strone
+        bool isCandidateCreated = await _candidateService.AddCandidateAsync(candidate); 
 
-        
+        // If vreation succes go to main page else show error
+        if (isCandidateCreated)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "Candidate was not added. Please try again.";
+        }  
     }
 
 }
