@@ -1,6 +1,8 @@
 using GenderNeutralizer.App.Client.Pages;
 using GenderNeutralizer.App.Components;
+using GenderNeutralizer.App.Database;
 using GenderNeutralizer.App.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +13,10 @@ builder.Services.AddRazorComponents()
 
 // Register Http service
 builder.Services.AddHttpClient();
+
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
 
 builder.Services.AddTransient<ILocalDriveService, LocalDriveService>();
 builder.Services.AddTransient<ITextExtractionService, TextExtractionService>(); 
