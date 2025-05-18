@@ -3,12 +3,46 @@
 @using GenderNeutralizer.App.Services
 
 @inject ITextExtractionService _textExtractionService
+@inject ICandidateService _candidateService
 
 @rendermode InteractiveServer
 
 <h3>CandidateList</h3>
 
+<!-- Gathering user from sql db -->
+@if (candidates.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Numer</th>
+                <th>Imie</th>
+                <th>Nazwisko</th>
+                <th>Akcja</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var candidate in candidates)
+            {
+                <tr>
+                    <td>@candidate.CandidateId</td>
+                    <td>@candidate.CandidateName</td>
+                    <td>@candidate.CandidateLastName</td>
+                    <td>
+                        <!-- Add any actions you want, like download or delete -->
+                        <button class="btn btn-danger btn-sm" @onclick="TextExtraction">Wyślij do managera</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No candidates in database .</p>
+}
 
+<!-- Gathering user base on local disc -->
 @if (files != null && files.Any())
 {
     <table class="table">
@@ -40,10 +74,16 @@ else
 }
 
 @code {
+
+    private List<Candidate> candidates = new List<Candidate>();
+
     private List<FileInfo> files;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        // Gathering candidates from sql db
+        candidates = await _candidateService.GetAllCandidatesAsync();
+
         string directoryPath = @"C:\VirtualServer\GenderNeutralizer"; // Replace with your folder path
         if (Directory.Exists(directoryPath))
         {
