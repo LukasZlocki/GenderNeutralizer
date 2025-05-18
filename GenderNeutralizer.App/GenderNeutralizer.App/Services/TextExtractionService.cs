@@ -13,23 +13,23 @@ namespace GenderNeutralizer.App.Services
         }
 
 
-        public string ExtractTextFromFile(FileCV file)
+        public string ExtractTextFromFile(string filePath)
         {
             // ToDo: implement parameters to extract file from given file path
             // LZ, 2023-10-02 right now is simple test to read file
-            string extractedText = txtExtraction();
+            string extractedText = txtExtraction(filePath);
             return extractedText;
         }
 
-        private string txtExtraction()
+        private string txtExtraction(string filePath)
         {
-            string pdfPath = @"C:\VirtualServer\GenderNeutralizer\textToExtract.pdf";
+            //string pdfPath = @"C:\VirtualServer\GenderNeutralizer\textToExtract.pdf";
             string outputFolder = @"C:\VirtualServer\GenderNeutralizer\output";
             string extractedText = string.Empty;
             string neutralizedText = string.Empty;
 
             // Step 1: Extracting text from cv in pdf format 
-            extractedText = ExtractTextFromPdf(pdfPath, outputFolder);
+            extractedText = ExtractTextFromPdf(filePath, outputFolder);
 
             // Step 2: Saving extracted raw text to file
             // saving extracted text to file
