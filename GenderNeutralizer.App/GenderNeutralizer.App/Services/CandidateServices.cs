@@ -45,7 +45,24 @@ namespace GenderNeutralizer.App.Services
         {
             try
             {
-                return await _db.Candidates.ToListAsync();
+                return await _db.Candidates
+                    .Where(b => b.isCvNeutralized == false)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving candidates");
+                return new List<Candidate>();
+            }
+        }
+
+        public async Task<List<Candidate>> GetAllNeutralizedCandidatesAsync()
+        {
+            try
+            {
+                return await _db.Candidates
+                    .Where(b => b.isCvNeutralized == true)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
