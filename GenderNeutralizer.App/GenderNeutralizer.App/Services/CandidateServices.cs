@@ -1,5 +1,6 @@
 ﻿using GenderNeutralizer.App.Database;
 using GenderNeutralizer.App.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GenderNeutralizer.App.Services
 {
@@ -15,7 +16,11 @@ namespace GenderNeutralizer.App.Services
         }
 
 
-       
+        /// <summary>
+        /// Adds a new candidate to the database.
+        /// </summary>
+        /// <param name="candidate"></param>
+        /// <returns></returns>
         public async Task<bool> AddCandidateAsync(Candidate candidate)
         {
             try
@@ -31,5 +36,58 @@ namespace GenderNeutralizer.App.Services
                 return false;
             }
         }
+
+        /// <summary>
+        /// Retrieves all candidates from the database.
+        /// </summary>
+        /// <returns></returns>
+        public async Task<List<Candidate>> GetAllCandidatesAsync()
+        {
+            try
+            {
+                return await _db.Candidates.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving candidates");
+                return new List<Candidate>();
+            }
+        }
+
+        /// <summary>
+        /// Updates an existing candidate in the database.
+        /// </summary>
+        /// <param name="candidate">Object Candidate</param>
+        /// <returns>bolean</returns>
+        public async Task<bool> UpdateCandidateAsync(Candidate candidate)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidate.CandidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidate.CandidateId);
+                    return false;
+                }
+
+                // Update properties
+                existingCandidate.CandidateName = candidate.CandidateName;
+                existingCandidate.CandidateLastName = candidate.CandidateLastName;
+                existingCandidate.CvFilePath = candidate.CvFilePath;
+                existingCandidate.RawTextCv = candidate.RawTextCv;
+                existingCandidate.NeutralizedText = candidate.NeutralizedText;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidate.CandidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidate.CandidateId);
+                return false;
+            }
+        }
+
+
     }
 }
