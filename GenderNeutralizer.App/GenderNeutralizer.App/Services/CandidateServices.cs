@@ -88,6 +88,54 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<bool> UpdateCandidateNeutralizedTxt(string neutralizedTxt, int candidateId)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidateId);
+                    return false;
+                }
 
+                // Update neutralized text propertie
+                existingCandidate.NeutralizedText = neutralizedTxt;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidateId);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCandidateRawTxtCv(string rawTxtCv, int candidateId)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidateId);
+                    return false;
+                }
+
+                // Update neutralized text propertie
+                existingCandidate.RawTextCv = rawTxtCv;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidateId);
+                return false;
+            }
+        }
     }
 }
