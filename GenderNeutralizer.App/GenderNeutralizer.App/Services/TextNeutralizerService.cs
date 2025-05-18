@@ -15,15 +15,15 @@ namespace GenderNeutralizer.App.Services
 
         private string Testchat(string textToSummarize)
         {
-            string apiKey = "open api key here";
+            string apiKey = "add open ai key here";
             string testString = string.Empty;
             try
             {
                 ChatClient client = new(model: "gpt-4o", apiKey);
 
                 ChatCompletion completion = client.CompleteChat
-                    ("Podsumuj mi to CV piszac osobno adres, osobno edukacja, osobno doswiadczeniezawodowe: " +
-                    "dodatkowo tekst zanonimizuj tak bym nie wiedział czy to kobieta czy mężczyzna, tekst: "+ textToSummarize);
+                    ("Podsumuj mi to CV wypisując tylko i wyłącznie osobno edukacje, osobno doswiadczenie zawodowe, osobno kursy i szkolenia, osobno umiejętności, osobno zainteresowania/hobby. Nic wiecej nie wypisuj. " +
+                    "dodatkowo tekst zanonimizuj tak bym nie wiedział czy to kobieta czy mężczyzna. pracuj na tekście poniżej:"+ textToSummarize);
 
                 Console.WriteLine($"[ASSISTANT]: {completion.Content[0].Text}");
                 testString = completion.Content[0].Text;

@@ -52,7 +52,7 @@ else
 <br />
 <br />
 <h3>Kandydaci do decyzji:</h3>
-@if (NewCandidates.Any())
+@if (NeutralizedCandidates.Any())
 {
     <div class="table-responsive">
         <table class="table table-hover table-bordered align-middle">
@@ -140,7 +140,7 @@ else
         bool isCandidateNeutralized = await _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
         if (isCandidateNeutralized)
         {
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: false);
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }   
     }
 
