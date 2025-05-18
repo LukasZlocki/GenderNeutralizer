@@ -30,7 +30,7 @@
                     <td>@candidate.CandidateLastName</td>
                     <td>
                         <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="() => TextExtraction(candidate.CvFilePath)">Wyślij do managera</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => TextExtraction(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
                     </td>
                 </tr>
             }
@@ -55,8 +55,8 @@ else
     }
 
     // On button click extracting text from pdf file
-    public void TextExtraction(string filePath)
+    public void TextExtraction(string filePath, string candidateId)
     {
-        var txt = _textExtractionService.ExtractTextFromFile(filePath);
+        var txt = _textExtractionService.ExtractTextFromFile(filePath, candidateId);
     }
 }
