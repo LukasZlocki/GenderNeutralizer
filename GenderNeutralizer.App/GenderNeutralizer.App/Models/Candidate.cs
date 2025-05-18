@@ -8,5 +8,6 @@
         public string? CvFilePath { get; set; }
         public string? RawTextCv { get; set; }
         public string? NeutralizedText { get; set; }
+        public bool isCvNeutralized { get; set; } = false;
     }
 }
