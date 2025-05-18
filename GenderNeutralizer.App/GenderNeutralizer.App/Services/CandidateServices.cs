@@ -37,6 +37,19 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<bool> DeleteCandidateAsync(int candidateId)
+        {
+            var candidate = await _db.Candidates.FindAsync(candidateId);
+
+            if (candidate == null)
+                return false;
+
+            _db.Candidates.Remove(candidate);
+            await _db.SaveChangesAsync();
+
+            return true;
+        }
+
         /// <summary>
         /// Retrieves all candidates from the database.
         /// </summary>
@@ -45,7 +58,24 @@ namespace GenderNeutralizer.App.Services
         {
             try
             {
-                return await _db.Candidates.ToListAsync();
+                return await _db.Candidates
+                    .Where(b => b.isCvNeutralized == false)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving candidates");
+                return new List<Candidate>();
+            }
+        }
+
+        public async Task<List<Candidate>> GetAllNeutralizedCandidatesAsync()
+        {
+            try
+            {
+                return await _db.Candidates
+                    .Where(b => b.isCvNeutralized == true)
+                    .ToListAsync();
             }
             catch (Exception ex)
             {
@@ -88,6 +118,54 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<bool> UpdateCandidateNeutralizedTxt(string neutralizedTxt, int candidateId)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidateId);
+                    return false;
+                }
 
+                // Update neutralized text propertie
+                existingCandidate.NeutralizedText = neutralizedTxt;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidateId);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateCandidateRawTxtCv(string rawTxtCv, int candidateId)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidateId);
+                    return false;
+                }
+
+                // Update neutralized text propertie
+                existingCandidate.RawTextCv = rawTxtCv;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidateId);
+                return false;
+            }
+        }
     }
 }

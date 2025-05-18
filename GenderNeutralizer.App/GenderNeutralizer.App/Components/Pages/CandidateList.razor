@@ -4,13 +4,14 @@
 
 @inject ITextExtractionService _textExtractionService
 @inject ICandidateService _candidateService
+@inject NavigationManager Navigation
 
 @rendermode InteractiveServer
 
-<h3>CandidateList</h3>
-
-<!-- Gathering user from sql db -->
-@if (candidates.Any())
+<!-- Gathering new user from sql db -->
+<br />
+<h3>Nowi kandydaci:</h3>
+@if (NewCandidates.Any())
 {
     <table class="table">
         <thead>
@@ -22,7 +23,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var candidate in candidates)
+            @foreach (var candidate in NewCandidates)
             {
                 <tr>
                     <td>@candidate.CandidateId</td>
@@ -30,7 +31,11 @@
                     <td>@candidate.CandidateLastName</td>
                     <td>
                         <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="TextExtraction">Wyślij do managera</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
+                        <button class="btn btn-outline-primary btn-sm"
+                                @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                            Usuń kandydata
+                        </button>
                     </td>
                 </tr>
             }
@@ -39,79 +44,86 @@
 }
 else
 {
-    <p>No candidates in database .</p>
+    <p>Brak nowych kandydatów .</p>
 }
 
-<!-- Gathering user base on local disc -->
-@if (files != null && files.Any())
+<!-- Gathering neutralized user from sql db -->
+<br />
+<br />
+<br />
+<h3>Kandydaci do decyzji:</h3>
+@if (NewCandidates.Any())
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>File Name</th>
-                <th>File Size (KB)</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var file in files)
-            {
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered align-middle">
+            <thead class="table-dark">
                 <tr>
-                    <td>@file.FileName</td>
-                    <td>@(file.FileSize / 1024) KB</td>
-                    <td>
-                        <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="TextExtraction">Neutralize</button>
-                    </td>
+                    <th scope="col">#</th>
+                    <th scope="col">Imię</th>
+                    <th scope="col">Nazwisko</th>
+                    <th scope="col">Akcja</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var candidate in NeutralizedCandidates)
+                {
+                    <tr>
+                        <td>@candidate.CandidateId</td>
+                        <td>@candidate.CandidateName</td>
+                        <td>@candidate.CandidateLastName</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm"
+                            @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">
+                                Pokaż CV
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm"
+                            @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                                Usuń kandydata
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 else
 {
-    <p>No files found in the folder.</p>
+    <p>Brak kandydatów.</p>
 }
+
 
 @code {
 
-    private List<Candidate> candidates = new List<Candidate>();
-
-    private List<FileInfo> files;
+    private List<Candidate> NewCandidates = new List<Candidate>();
+    private List<Candidate> NeutralizedCandidates = new List<Candidate>();
 
     protected override async Task OnInitializedAsync()
     {
-        // Gathering candidates from sql db
-        candidates = await _candidateService.GetAllCandidatesAsync();
+        // Gathering new candidates from sql db
+        NewCandidates = await _candidateService.GetAllCandidatesAsync();
 
-        string directoryPath = @"C:\VirtualServer\GenderNeutralizer"; // Replace with your folder path
-        if (Directory.Exists(directoryPath))
-        {
-            var directoryInfo = new DirectoryInfo(directoryPath);
-            files = directoryInfo.GetFiles()
-                                 .Select(f => new FileInfo
-                                     {
-                                         FileName = f.Name,
-                                         FileSize = f.Length
-                                     })
-                                 .ToList();
-        }
-        else
-        {
-            files = new List<FileInfo>();
-        }
+        // Gathering neutralized candidates from sql db
+        NeutralizedCandidates = await _candidateService.GetAllNeutralizedCandidatesAsync();
+
     }
 
-    public class FileInfo
+    // On button click extracting text from pdf file
+    private async void CvNeutralize(string filePath, int candidateId)
     {
-        public string? FileName { get; set; }
-        public long FileSize { get; set; }
+        bool isCandidateNeutralized = await _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
+        if (isCandidateNeutralized)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: false);
+        }   
     }
 
-    public void TextExtraction()
+    private async void DeleteCandidate(int candidateId)
     {
-        // [LZ] Empty file !!!!
-        FileCV file = new FileCV();
-        var txt = _textExtractionService.ExtractTextFromFile(file);
+        bool isCandidateDeleted = await _candidateService.DeleteCandidateAsync(candidateId);   
+        if (isCandidateDeleted)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
     }
 }

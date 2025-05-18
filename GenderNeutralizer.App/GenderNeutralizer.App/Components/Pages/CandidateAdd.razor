@@ -54,7 +54,7 @@
     {
         var file = e.File;
 
-        using var stream = file.OpenReadStream(maxAllowedSize: 10_000_000);
+        using var stream = file.OpenReadStream(maxAllowedSize: 50_000_000);
         using var memoryStream = new MemoryStream();
         await stream.CopyToAsync(memoryStream);
 
