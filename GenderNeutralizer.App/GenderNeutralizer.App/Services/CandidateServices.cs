@@ -131,6 +131,7 @@ namespace GenderNeutralizer.App.Services
 
                 // Update neutralized text propertie
                 existingCandidate.NeutralizedText = neutralizedTxt;
+                existingCandidate.isCvNeutralized = true;
 
                 await _db.SaveChangesAsync();
                 _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);

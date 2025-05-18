@@ -31,6 +31,11 @@ namespace GenderNeutralizer.App.Services
             // save neutralized text to db
             bool isCandidateNeutralized = await _candidateService.UpdateCandidateNeutralizedTxt(neutralizedText, candidateId);
 
+            if (isCandidateNeutralized)
+            {
+
+            }
+
             if (!isCandidateUpdated && !isCandidateNeutralized)
             {
                 // ToDo : Handle error
