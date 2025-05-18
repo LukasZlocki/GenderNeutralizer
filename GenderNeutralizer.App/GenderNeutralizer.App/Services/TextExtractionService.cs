@@ -5,6 +5,14 @@ namespace GenderNeutralizer.App.Services
 {
     public class TextExtractionService : ITextExtractionService
     {
+        private readonly ITextNeutralizerService _textNeutralizerService;
+
+        public TextExtractionService(ITextNeutralizerService textNeutralizerService)
+        {
+            _textNeutralizerService = textNeutralizerService;
+        }
+
+
         public string ExtractTextFromFile(FileCV file)
         {
             // ToDo: implement parameters to extract file from given file path
@@ -37,7 +45,10 @@ namespace GenderNeutralizer.App.Services
             // Step 4: Connect to AI API and neutralize the text
             // ToDo : Code cnnection to AI API
             // ToDo : Code sending data to API and getting it back
-
+            string neutralizedTxt = _textNeutralizerService.NeutralizeAndSummarizeCvText(formatText);
+            // ToDo : save neutralized text here
+            string fullOutputPath3 = Path.Combine(outputFolder, "extractedText_AI.txt");
+            isSucces = SaveText(neutralizedTxt, fullOutputPath3);
 
             return neutralizedText;
         }

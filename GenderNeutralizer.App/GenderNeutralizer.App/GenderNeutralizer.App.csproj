@@ -9,6 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\GenderNeutralizer.App.Client\GenderNeutralizer.App.Client.csproj" />
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.14" />
+    <PackageReference Include="OpenAI" Version="2.1.0" />
     <PackageReference Include="PdfPig" Version="0.1.10" />
     <PackageReference Include="System.Drawing.Common" Version="9.0.5" />
   </ItemGroup>
