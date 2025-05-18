@@ -37,6 +37,19 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<bool> DeleteCandidateAsync(int candidateId)
+        {
+            var candidate = await _db.Candidates.FindAsync(candidateId);
+
+            if (candidate == null)
+                return false;
+
+            _db.Candidates.Remove(candidate);
+            await _db.SaveChangesAsync();
+
+            return true;
+        }
+
         /// <summary>
         /// Retrieves all candidates from the database.
         /// </summary>

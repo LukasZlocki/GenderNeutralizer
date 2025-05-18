@@ -4,6 +4,7 @@
 
 @inject ITextExtractionService _textExtractionService
 @inject ICandidateService _candidateService
+@inject NavigationManager Navigation
 
 @rendermode InteractiveServer
 
@@ -30,7 +31,11 @@
                     <td>@candidate.CandidateLastName</td>
                     <td>
                         <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="() => TextExtraction(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
+                        <button class="btn btn-outline-primary btn-sm"
+                                @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                            Usuń kandydata
+                        </button>
                     </td>
                 </tr>
             }
@@ -68,8 +73,12 @@ else
                         <td>@candidate.CandidateLastName</td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm"
-                                    @onclick="() => TextExtraction(candidate.CvFilePath, candidate.CandidateId)">
+                            @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">
                                 Pokaż CV
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm"
+                            @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                                Usuń kandydata
                             </button>
                         </td>
                     </tr>
@@ -100,8 +109,21 @@ else
     }
 
     // On button click extracting text from pdf file
-    public void TextExtraction(string filePath, int candidateId)
+    private async void CvNeutralize(string filePath, int candidateId)
     {
-        var txt = _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
+        bool isCandidateNeutralized = await _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
+        if (isCandidateNeutralized)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: false);
+        }   
+    }
+
+    private async void DeleteCandidate(int candidateId)
+    {
+        bool isCandidateDeleted = await _candidateService.DeleteCandidateAsync(candidateId);   
+        if (isCandidateDeleted)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
     }
 }
