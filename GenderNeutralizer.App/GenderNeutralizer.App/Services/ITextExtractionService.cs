@@ -4,6 +4,6 @@ namespace GenderNeutralizer.App.Services
 {
     public interface ITextExtractionService
     {
-        public string ExtractTextFromFile(string filePath);
+        public Task<bool> NeutralizeCandidateCv(string filePath, int candidateId);
     }
 }

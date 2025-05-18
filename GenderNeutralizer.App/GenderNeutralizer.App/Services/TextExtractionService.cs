@@ -1,4 +1,5 @@
 ﻿using GenderNeutralizer.App.Models;
+using System.Runtime.Serialization;
 using PdfDocument = UglyToad.PdfPig.PdfDocument;
 
 namespace GenderNeutralizer.App.Services
@@ -6,19 +7,38 @@ namespace GenderNeutralizer.App.Services
     public class TextExtractionService : ITextExtractionService
     {
         private readonly ITextNeutralizerService _textNeutralizerService;
+        private readonly ICandidateService _candidateService;
 
-        public TextExtractionService(ITextNeutralizerService textNeutralizerService)
+        public TextExtractionService(ITextNeutralizerService textNeutralizerService, ICandidateService candidateService)
         {
             _textNeutralizerService = textNeutralizerService;
+            _candidateService = candidateService;
         }
 
 
-        public string ExtractTextFromFile(string filePath)
+        public async Task<bool> NeutralizeCandidateCv(string filePath, int candidateId)
         {
             // ToDo: implement parameters to extract file from given file path
             // LZ, 2023-10-02 right now is simple test to read file
             string extractedText = txtExtraction(filePath);
-            return extractedText;
+
+            // update camdidate in db with extracted raw text
+            bool isCandidateUpdated = await _candidateService.UpdateCandidateRawTxtCv(extractedText, candidateId);
+
+            // ToDo : neutralize text by AI agents
+            string neutralizedText = txtAiNeutralization(extractedText);
+
+            // save neutralized text to db
+            bool isCandidateNeutralized = await _candidateService.UpdateCandidateNeutralizedTxt(neutralizedText, candidateId);
+
+
+            if (!isCandidateUpdated && !isCandidateNeutralized)
+            {
+                // ToDo : Handle error
+                //throw new Exception("Failed to update candidate with neutralized text.");
+                return false;
+            }
+            return true;
         }
 
         private string txtExtraction(string filePath)
@@ -31,6 +51,9 @@ namespace GenderNeutralizer.App.Services
             // Step 1: Extracting text from cv in pdf format 
             extractedText = ExtractTextFromPdf(filePath, outputFolder);
 
+            return extractedText;
+
+            /*
             // Step 2: Saving extracted raw text to file
             // saving extracted text to file
             string fullOutputPath1 = Path.Combine(outputFolder, "extractedText.txt");
@@ -51,6 +74,19 @@ namespace GenderNeutralizer.App.Services
             isSucces = SaveText(neutralizedTxt, fullOutputPath3);
 
             return neutralizedText;
+            */
+        }
+
+        private string txtAiNeutralization(string txtToBeNeutralized)
+        {
+            // Step 4: Connect to AI API and neutralize the text
+            string neutralizedTxt = _textNeutralizerService.NeutralizeAndSummarizeCvText(txtToBeNeutralized);
+            /*
+            // ToDo : save neutralized text here
+            string fullOutputPath3 = Path.Combine(outputFolder, "extractedText_AI.txt");
+            isSucces = SaveText(neutralizedTxt, fullOutputPath3);
+            */
+            return neutralizedTxt;
         }
 
 
@@ -120,6 +156,6 @@ namespace GenderNeutralizer.App.Services
             return result;
         }
 
-
+ 
     }
 }
