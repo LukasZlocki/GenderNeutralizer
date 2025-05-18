@@ -55,8 +55,8 @@ else
     }
 
     // On button click extracting text from pdf file
-    public void TextExtraction(string filePath, string candidateId)
+    public void TextExtraction(string filePath, int candidateId)
     {
-        var txt = _textExtractionService.ExtractTextFromFile(filePath, candidateId);
+        var txt = _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
     }
 }
