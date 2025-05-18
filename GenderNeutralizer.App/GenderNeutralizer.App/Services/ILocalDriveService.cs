@@ -4,6 +4,6 @@ namespace GenderNeutralizer.App.Services
 {
     public interface ILocalDriveService
     {
-        public Task<bool> UploadCV(FileCV file);
+        public string UploadCV(FileCV file);
     }
 }

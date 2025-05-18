@@ -15,12 +15,16 @@ builder.Services.AddRazorComponents()
 builder.Services.AddHttpClient();
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sql => sql.CommandTimeout(60) // Timeout in seconds
+    ));
 
 
-builder.Services.AddTransient<ILocalDriveService, LocalDriveService>();
-builder.Services.AddTransient<ITextExtractionService, TextExtractionService>(); 
-builder.Services.AddTransient<ITextNeutralizerService, TextNeutralizerService>();   
+builder.Services.AddScoped<ILocalDriveService, LocalDriveService>();
+builder.Services.AddScoped<ITextExtractionService, TextExtractionService>(); 
+builder.Services.AddScoped<ITextNeutralizerService, TextNeutralizerService>();
+builder.Services.AddScoped<ICandidateService, CandidateServices>();
 
 var app = builder.Build();
 

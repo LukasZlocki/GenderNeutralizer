@@ -7,25 +7,49 @@
 @inject HttpClient Http
 
 @inject ILocalDriveService _driveService
+@inject ICandidateService _candidateService
+@inject NavigationManager Navigation
 
 <PageTitle>Add Candidate</PageTitle>
 
-<h1>Add Candidate</h1>
+<h1>Dodawanie kandydata</h1>
 
-<p>Add your CV here.</p>
+<p>Podaj imie i nazwisko oraz dodaj swoje CV.</p>
 
+<!-- Candidate Name and Last Name Input Fields -->
+<div class="mb-3">
+    <label for="firstName" class="form-label">Imię</label>
+    <InputText id="firstName" class="form-control" @bind-Value="candidate.CandidateName" />
+</div>
 
+<div class="mb-3">
+    <label for="lastName" class="form-label">Nazwisko</label>
+    <InputText id="lastName" class="form-control" @bind-Value="candidate.CandidateLastName" />
+</div>
+
+<!-- CV Upload Section -->
+<label for="cvUpload" class="form-label">Dodaj swoje CV</label>
 <InputFile OnChange="OnInputFileChange" />
 @if (uploadedFile != null)
 {
     <p>Selected File: @uploadedFile.FileName</p>
-    <button class="btn btn-success rounded-pill px-4 shadow" @onclick="UploadToDisc">Upload to Server</button>
+    <button class="btn btn-success rounded-pill px-4 shadow" @onclick="CreateCandidate">Stwórz profil</button>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger">@errorMessage</div>
 }
 
 
 @code {
     private FileCV? uploadedFile;
+    private Candidate candidate = new();
 
+    // error message purpose
+    private string? errorMessage;
+
+    // Upload file to FileCv object
     private async Task OnInputFileChange(InputFileChangeEventArgs e)
     {
         var file = e.File;
@@ -42,21 +66,49 @@
             };
     }
 
-    private async Task UploadToDisc()
+    // Upload file to local disc
+    private string UploadToDisc()
     {
-        if (uploadedFile == null) return;
+        string linkToUploadedFile = "";
+
+        if (uploadedFile == null) return linkToUploadedFile;
 
         //var response = await Http.PostAsync("uploadcv", content); // make sure the endpoint matches your API route
-        var response = await _driveService.UploadCV(uploadedFile);
+        linkToUploadedFile = _driveService.UploadCV(uploadedFile);
 
-        if (response)
+        if (!string.IsNullOrWhiteSpace(linkToUploadedFile))
         {
             Console.WriteLine("File uploaded to disk.");
+            return linkToUploadedFile;
         }
         else
         {
             Console.WriteLine("Upload failed.");
+            return linkToUploadedFile;
         }
+    }
+
+    // Create candidate main method
+    private async Task CreateCandidate()
+    {
+        // upload file to disk and 
+        string pathToFile = UploadToDisc();
+
+        //get the path of uploaded file
+        candidate.CvFilePath = pathToFile;
+
+        // ToDo: stworzyc kandydata - parametr object candidate
+        bool isCandidateCreated = await _candidateService.AddCandidateAsync(candidate); 
+
+        // If vreation succes go to main page else show error
+        if (isCandidateCreated)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            errorMessage = "Candidate was not added. Please try again.";
+        }  
     }
 
 }
