@@ -33,7 +33,7 @@
                         <!-- Add any actions you want, like download or delete -->
                         <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
                         <button class="btn btn-outline-primary btn-sm"
-                                @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                        @onclick="() => DeleteCandidate(candidate.CandidateId)">
                             Usuń kandydata
                         </button>
                     </td>
@@ -73,7 +73,7 @@ else
                         <td>@candidate.CandidateLastName</td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm"
-                            @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">
+                            @onclick="() => ShowCandidate(candidate.NeutralizedText)">
                                 Pokaż CV
                             </button>
                             <button class="btn btn-outline-primary btn-sm"
@@ -92,8 +92,34 @@ else
     <p>Brak kandydatów.</p>
 }
 
+<!-- Modal to show neutralized cv -->
+@if (showModal)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Zanonimizowane CV</h5>
+                    <button type="button" class="btn-close" @onclick="CloseModal"></button>
+                </div>
+                <div class="modal-body">
+                    <pre>@selectedCandidateCv</pre> <!-- Preformatted for readability -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" @onclick="CloseModal">Zamknij</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-backdrop fade show"></div>
+}
+
 
 @code {
+
+    // For modal purposes
+    private bool showModal = false;
+    private string selectedCandidateCv = string.Empty;
 
     private List<Candidate> NewCandidates = new List<Candidate>();
     private List<Candidate> NeutralizedCandidates = new List<Candidate>();
@@ -125,5 +151,16 @@ else
         {
             Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
+    }
+
+    private void ShowCandidate(string NeutralizedCv)
+    {
+        selectedCandidateCv = NeutralizedCv;
+        showModal = true;
+    }
+
+    private void CloseModal()
+    {
+        showModal = false;
     }
 }
