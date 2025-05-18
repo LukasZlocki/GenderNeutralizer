@@ -20,7 +20,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 builder.Services.AddTransient<ILocalDriveService, LocalDriveService>();
 builder.Services.AddTransient<ITextExtractionService, TextExtractionService>(); 
-builder.Services.AddTransient<ITextNeutralizerService, TextNeutralizerService>();   
+builder.Services.AddTransient<ITextNeutralizerService, TextNeutralizerService>();
+builder.Services.AddTransient<ICandidateService, CandidateServices>();
 
 var app = builder.Build();
 
