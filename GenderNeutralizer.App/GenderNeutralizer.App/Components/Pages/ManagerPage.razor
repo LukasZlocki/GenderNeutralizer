@@ -1,9 +1,14 @@
 ﻿@page "/managerpage"
+
 @using GenderNeutralizer.App.Models
 @using GenderNeutralizer.App.Services
-<h3>Strefa Managera</h3>
 
 @inject ICandidateService _candidateService
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+<h3>Strefa Managera</h3>
 
 <!-- Gathering neutralized user from sql db -->
 <br />
@@ -16,9 +21,7 @@
         <table class="table table-hover table-bordered align-middle">
             <thead class="table-dark">
                 <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Imię</th>
-                    <th scope="col">Nazwisko</th>
+                    <th scope="col">Kandydat Id</th>
                     <th scope="col">Akcja</th>
                 </tr>
             </thead>
@@ -27,8 +30,6 @@
                 {
                     <tr>
                         <td>@candidate.CandidateId</td>
-                        <td>@candidate.CandidateName</td>
-                        <td>@candidate.CandidateLastName</td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm"
                             @onclick="() => ShowCandidate(candidate.NeutralizedText)">
@@ -92,7 +93,7 @@ else
         if (service = true)
         {
             // Refresh the list of candidates
-            NeutralizedCandidates = await _candidateService.GetAllNeutralizedCandidatesAsync();
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
         }
         else
         {

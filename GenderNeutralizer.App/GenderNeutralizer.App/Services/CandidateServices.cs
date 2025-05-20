@@ -59,7 +59,7 @@ namespace GenderNeutralizer.App.Services
             try
             {
                 return await _db.Candidates
-                    .Where(b => b.isCvNeutralized == false)
+                    .Where(b => b.isCvNeutralized == false && b.IsCandidateToMeet == false)
                     .ToListAsync();
             }
             catch (Exception ex)

@@ -15,7 +15,7 @@ namespace GenderNeutralizer.App.Services
 
         private string Testchat(string textToSummarize)
         {
-            string apiKey = "add open ai key here";
+            string apiKey = "api key add here";
             string testString = string.Empty;
             try
             {

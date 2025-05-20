@@ -1,4 +1,5 @@
 ﻿@page "/candidatelist"
+
 @using GenderNeutralizer.App.Models
 @using GenderNeutralizer.App.Services
 
@@ -17,6 +18,8 @@
         <thead>
             <tr>
                 <th>Numer kandydata</th>
+                <th scope="col">Imię</th>
+                <th scope="col">Nazwisko</th>
                 <th>Akcja</th>
             </tr>
         </thead>
@@ -25,9 +28,11 @@
             {
                 <tr>
                     <td>@candidate.CandidateId</td>
+                    <td>@candidate.CandidateName</td>
+                    <td>@candidate.CandidateLastName</td>
                     <td>
                         <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Neutralizuj CV</button>
                         <button class="btn btn-outline-primary btn-sm"
                         @onclick="() => DeleteCandidate(candidate.CandidateId)">
                             Usuń kandydata

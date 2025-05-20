@@ -1,9 +1,15 @@
 ﻿@page "/candidatetomeet"
+
 @using GenderNeutralizer.App.Models
 @using GenderNeutralizer.App.Services
-<h3>Strefa HR</h3>
 
 @inject ICandidateService _candidateService
+@inject NavigationManager Navigation
+
+@rendermode InteractiveServer
+
+
+<h3>Strefa HR</h3>
 
 <!-- Gathering neutralized user from sql db -->
 <br />
@@ -33,6 +39,10 @@
                             <button class="btn btn-outline-primary btn-sm"
                                     @onclick="() => ShowCandidate(candidate.NeutralizedText)">
                                 Pokaż CV
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm"
+                                    @onclick="() => DeleteCandidate(candidate.CandidateId)">
+                                Usuń kandydata
                             </button>
                         </td>
                     </tr>
@@ -80,6 +90,15 @@ else
         // Gathering neutralized candidates from sql db
         AcceptedCandidates = await _candidateService.GetAllCandidatesToMeetAsync();
 
+    }
+
+    private async void DeleteCandidate(int candidateId)
+    {
+        bool isCandidateDeleted = await _candidateService.DeleteCandidateAsync(candidateId);
+        if (isCandidateDeleted)
+        {
+            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+        }
     }
 
     private void ShowCandidate(string NeutralizedCv)
