@@ -9,5 +9,6 @@
         public string? RawTextCv { get; set; }
         public string? NeutralizedText { get; set; }
         public bool isCvNeutralized { get; set; } = false;
+        public bool IsCandidateToMeet { get; set; } = false;
     }
 }
