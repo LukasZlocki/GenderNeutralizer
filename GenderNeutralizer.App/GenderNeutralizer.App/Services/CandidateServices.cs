@@ -99,6 +99,32 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<bool> UpdateCandidateAcceptedToMeet(int candidateId)
+        {
+            try
+            {
+                var existingCandidate = await _db.Candidates.FindAsync(candidateId);
+                if (existingCandidate == null)
+                {
+                    _logger.LogWarning("Candidate with ID {Id} not found.", candidateId);
+                    return false;
+                }
+
+                // Update status to ready to meet
+                existingCandidate.isCvNeutralized = false;
+                existingCandidate.IsCandidateToMeet = true;
+
+                await _db.SaveChangesAsync();
+                _logger.LogInformation("Candidate with ID {Id} updated.", candidateId);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating candidate with ID {Id}", candidateId);
+                return false;
+            }
+        }
+
         /// <summary>
         /// Updates an existing candidate in the database.
         /// </summary>

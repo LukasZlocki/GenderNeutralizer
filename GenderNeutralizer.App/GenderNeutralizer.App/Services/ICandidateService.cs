@@ -12,6 +12,7 @@ namespace GenderNeutralizer.App.Services
         Task<bool> UpdateCandidateAsync(Candidate candidate);
         Task<bool> UpdateCandidateRawTxtCv(string rawTxtCv, int candidateId);
         Task<bool> UpdateCandidateNeutralizedTxt(string neutralizedTxt, int candidateId);
+        Task<bool> UpdateCandidateAcceptedToMeet(int candidateId);
         Task<bool> DeleteCandidateAsync(int candidateId);
     }
 }
