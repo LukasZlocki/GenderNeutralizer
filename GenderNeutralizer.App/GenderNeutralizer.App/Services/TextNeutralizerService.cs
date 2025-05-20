@@ -22,7 +22,7 @@ namespace GenderNeutralizer.App.Services
                 ChatClient client = new(model: "gpt-4o", apiKey);
 
                 ChatCompletion completion = client.CompleteChat
-                    ("Podsumuj mi to CV wypisując tylko i wyłącznie osobno edukacje, osobno doswiadczenie zawodowe, osobno kursy i szkolenia, osobno umiejętności, osobno zainteresowania/hobby. Nic wiecej nie wypisuj. " +
+                    ("Podsumuj mi to CV wypisując tylko i wyłącznie osobno nr telefonu kontaktowego, osobno edukacje, osobno doswiadczenie zawodowe, osobno kursy i szkolenia, osobno umiejętności, osobno zainteresowania/hobby. Nic wiecej nie wypisuj. " +
                     "dodatkowo tekst zanonimizuj tak bym nie wiedział czy to kobieta czy mężczyzna. pracuj na tekście poniżej:"+ textToSummarize);
 
                 Console.WriteLine($"[ASSISTANT]: {completion.Content[0].Text}");

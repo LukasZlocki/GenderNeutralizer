@@ -1,47 +1,9 @@
-﻿@page "/candidatelist"
+﻿@page "/managerpage"
 @using GenderNeutralizer.App.Models
 @using GenderNeutralizer.App.Services
+<h3>Strefa Managera</h3>
 
-@inject ITextExtractionService _textExtractionService
 @inject ICandidateService _candidateService
-@inject NavigationManager Navigation
-
-@rendermode InteractiveServer
-
-<!-- Gathering new user from sql db -->
-<br />
-<h3>Nowi kandydaci:</h3>
-@if (NewCandidates.Any())
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Numer kandydata</th>
-                <th>Akcja</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var candidate in NewCandidates)
-            {
-                <tr>
-                    <td>@candidate.CandidateId</td>
-                    <td>
-                        <!-- Add any actions you want, like download or delete -->
-                        <button class="btn btn-danger btn-sm" @onclick="() => CvNeutralize(candidate.CvFilePath, candidate.CandidateId)">Wyślij do managera</button>
-                        <button class="btn btn-outline-primary btn-sm"
-                        @onclick="() => DeleteCandidate(candidate.CandidateId)">
-                            Usuń kandydata
-                        </button>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>Brak nowych kandydatów .</p>
-}
 
 <!-- Gathering neutralized user from sql db -->
 <br />
@@ -73,8 +35,8 @@ else
                                 Pokaż CV
                             </button>
                             <button class="btn btn-outline-primary btn-sm"
-                            @onclick="() => DeleteCandidate(candidate.CandidateId)">
-                                Usuń kandydata
+                            @onclick="() => AcceptCandidate(candidate.CandidateId)">
+                                Akceptacja kandydata
                             </button>
                         </td>
                     </tr>
@@ -110,42 +72,32 @@ else
     <div class="modal-backdrop fade show"></div>
 }
 
-
 @code {
+    private List<Candidate> NeutralizedCandidates = new List<Candidate>();
 
     // For modal purposes
     private bool showModal = false;
     private string selectedCandidateCv = string.Empty;
 
-    private List<Candidate> NewCandidates = new List<Candidate>();
-    private List<Candidate> NeutralizedCandidates = new List<Candidate>();
-
     protected override async Task OnInitializedAsync()
     {
-        // Gathering new candidates from sql db
-        NewCandidates = await _candidateService.GetAllCandidatesAsync();
-
         // Gathering neutralized candidates from sql db
         NeutralizedCandidates = await _candidateService.GetAllNeutralizedCandidatesAsync();
 
     }
 
-    // On button click extracting text from pdf file
-    private async void CvNeutralize(string filePath, int candidateId)
+    private async void AcceptCandidate(int candidateId)
     {
-        bool isCandidateNeutralized = await _textExtractionService.NeutralizeCandidateCv(filePath, candidateId);
-        if (isCandidateNeutralized)
+        var service = await _candidateService.UpdateCandidateAcceptedToMeet(candidateId);
+        if (service = true)
         {
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
-        }   
-    }
-
-    private async void DeleteCandidate(int candidateId)
-    {
-        bool isCandidateDeleted = await _candidateService.DeleteCandidateAsync(candidateId);   
-        if (isCandidateDeleted)
+            // Refresh the list of candidates
+            NeutralizedCandidates = await _candidateService.GetAllNeutralizedCandidatesAsync();
+        }
+        else
         {
-            Navigation.NavigateTo(Navigation.Uri, forceLoad: true);
+            // Handle error case
+            Console.WriteLine("Error accepting candidate.");
         }
     }
 
@@ -159,4 +111,5 @@ else
     {
         showModal = false;
     }
+
 }
