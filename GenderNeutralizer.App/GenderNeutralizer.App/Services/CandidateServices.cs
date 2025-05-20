@@ -69,6 +69,21 @@ namespace GenderNeutralizer.App.Services
             }
         }
 
+        public async Task<List<Candidate>> GetAllCandidatesToMeetAsync()
+        {
+            try
+            {
+                return await _db.Candidates
+                    .Where(b => b.IsCandidateToMeet == true)
+                    .ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving candidates");
+                return new List<Candidate>();
+            }
+        }
+
         public async Task<List<Candidate>> GetAllNeutralizedCandidatesAsync()
         {
             try
